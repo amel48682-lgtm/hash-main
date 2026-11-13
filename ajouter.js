@@ -1,4 +1,6 @@
+import { encrypt } from './crypto.js';  
 import readline from 'node:readline/promises';
+
 import { stdin as input, stdout as output } from 'node:process';
 import fs from 'node:fs/promises';
 import crypto from 'node:crypto';
@@ -10,23 +12,7 @@ if (secretKey.length !== 32) {
     throw new Error('SECRET_KEY must be exactly 32 bytes!');
 }
 
-function encrypt(text, key) {
-    // Always generate a brand new random 12-byte IV for every encryption
-    const iv = crypto.randomBytes(12);
-    const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
 
-    let encrypted = cipher.update(text, 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-
-    // Get the authentication tag (ensures data integrity)
-    const authTag = cipher.getAuthTag().toString('hex');
-
-    return {
-        iv: iv.toString('hex'),
-        encryptedData: encrypted,
-        authTag: authTag
-    };
-}
 
 export function decrypt(encryptedObj, key) {
     const decipher = crypto.createDecipheriv(
