@@ -34,3 +34,30 @@ export function decrypt(encryptedObj, key) {
 
     return decrypted;
 }
+
+
+// إنشاء Hash لكلمة المرور
+export function hashPassword(password) {
+    const salt = crypto.randomBytes(16).toString('hex');
+
+    const hash = crypto.scryptSync(password, salt, 64).toString('hex');
+
+    return {
+        salt: salt,
+        hash: hash
+    };
+}
+
+// التحقق من كلمة المرور
+export function verifyPassword(password, storedPassword) {
+
+    const hash = crypto.scryptSync(
+        password,
+        storedPassword.salt,
+        64
+    );
+
+    const originalHash = Buffer.from(storedPassword.hash, 'hex');
+
+    return crypto.timingSafeEqual(hash, originalHash);
+}
